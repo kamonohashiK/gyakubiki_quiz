@@ -8,7 +8,13 @@ class QuestionController extends Controller
 {
     public function index(Request $request)
     {
-        $answer = $request->answer;
+        //検索対象となる文字列が存在しない場合はトップにリダイレクト
+        if ($request->answer == null) {
+            return redirect('/');
+        } else {
+            $answer = $request->answer;
+        }
+
         return view('questions', compact('answer'));
     }
 }

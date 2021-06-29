@@ -40,4 +40,10 @@ class ExampleTest extends TestCase
         $response->assertViewIs('questions');
         $response->assertSee('piyoが答えになる問題');
     }
+
+    public function test_クエリがない場合はトップページにリダイレクト()
+    {
+        $response = $this->get('/questions');
+        $response->assertRedirect('/');
+    }
 }
