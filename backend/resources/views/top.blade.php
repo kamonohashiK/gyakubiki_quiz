@@ -2,11 +2,10 @@
 
 @section('content')
 <h3>最近追加された問題の答え</h3>
+
 <ul>
-    <li><a href="{{route('questions.index', ['answer' => 'hoge'])}}">hoge</a></li>
-    <li><a href="{{route('questions.index', ['answer' => '愛媛県'])}}">愛媛県</a></li>
-    <li><a href="{{route('questions.index', ['answer' => 'ランドルト環'])}}">ランドルト環</a></li>
-    <li><a href="{{route('questions.index', ['answer' => '新垣結衣'])}}">新垣結衣</a></li>
-    <li><a href="{{route('questions.index', ['answer' => '15'])}}">15</a></li>
+@foreach($answers as $a)
+    <li><a href="{{route('questions.index', ['answer' => $a->name])}}">{{$a->name}}</a></li>
+@endforeach
 </ul>
 @endsection

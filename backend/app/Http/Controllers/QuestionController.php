@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -12,10 +13,11 @@ class QuestionController extends Controller
         if ($request->answer == null) {
             return redirect('/');
         } else {
-            $answer = $request->answer;
+            $query = $request->answer;
+            $answer = Answer::where('name', $query)->first();
         }
 
-        return view('questions', compact('answer'));
+        return view('questions', compact('query', 'answer'));
     }
 
     public function show($question_id)

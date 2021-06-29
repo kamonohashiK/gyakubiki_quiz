@@ -16,4 +16,8 @@ class Question extends Model
     protected $fillable = [
         'content'
     ];
+
+    public function answer() {
+        return $this->belongsTo('App\Models\Answer');
+    }
 }
