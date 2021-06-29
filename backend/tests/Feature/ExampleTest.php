@@ -18,6 +18,7 @@ class ExampleTest extends TestCase
 
         $response->assertViewIs('top');
         $response->assertSee('top');
+        $response->assertSee('問題を検索');
         $response->assertSee('最近追加された問題の答え');
         $response->assertStatus(200);
     }
