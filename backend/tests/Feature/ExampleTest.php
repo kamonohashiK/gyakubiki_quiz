@@ -27,7 +27,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/questions?answer=hoge');
 
-        $response->assertViewIs('questions');
+        $response->assertViewIs('questions.index');
         $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
         $response->assertSee('hogeが答えになる問題');
@@ -38,11 +38,11 @@ class ExampleTest extends TestCase
     public function test_クエリによってquestionsで表示する文字列が変わる()
     {
         $response = $this->get('/questions?answer=fuga');
-        $response->assertViewIs('questions');
+        $response->assertViewIs('questions.index');
         $response->assertSee('fugaが答えになる問題');
 
         $response = $this->get('/questions?answer=piyo');
-        $response->assertViewIs('questions');
+        $response->assertViewIs('questions.index');
         $response->assertSee('piyoが答えになる問題');
     }
 

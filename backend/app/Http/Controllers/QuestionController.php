@@ -18,7 +18,7 @@ class QuestionController extends Controller
             $answer = Answer::where('name', $query)->first();
         }
 
-        return view('questions', compact('query', 'answer'));
+        return view('questions.index', compact('query', 'answer'));
     }
 
     public function show(Question $question)
