@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('questions');
+        $answer = $request->answer;
+        return view('questions', compact('answer'));
     }
 }

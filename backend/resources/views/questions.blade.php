@@ -1,1 +1,1 @@
-<h1>questions</h1>
+<h1>{{$answer}}が答えになる問題</h1>
