@@ -54,10 +54,18 @@ class ExampleTest extends TestCase
 
     public function test_問題詳細ページが正しく表示される()
     {
+        //TODO: テストケースを限定したテストに書き換え
+        //TODO: そろそろテストを分割したい
         $response = $this->get('/questions/1');
         $response->assertViewIs('questions.show');
         $response->assertSee('1');
         $response->assertSee('コメント一覧');
         $response->assertStatus(200);
+    }
+
+    public function test_存在しない問題のIDが入力されると404ページに行く()
+    {
+        $response = $this->get('/questions/2');
+        $response->assertStatus(404);
     }
 }

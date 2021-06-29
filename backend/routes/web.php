@@ -7,4 +7,4 @@ use App\Http\Controllers\QuestionController;
 Route::get('/', [TopController::class, 'top'])->name('top');
 
 Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
-Route::get('/questions/{question_id}', [QuestionController::class, 'show'])->name('questions.show');
+Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
