@@ -1,4 +1,4 @@
-<h1>top</h1>
+<a href="{{route('top')}}">クイズ逆引き事典</a>
 
 <h3>問題を検索</h3>
 <form action="{{route('questions.index')}}" method="GET">

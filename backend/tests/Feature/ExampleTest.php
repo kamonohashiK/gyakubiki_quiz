@@ -17,7 +17,7 @@ class ExampleTest extends TestCase
         $response = $this->get('/');
 
         $response->assertViewIs('top');
-        $response->assertSee('top');
+        $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
         $response->assertSee('最近追加された問題の答え');
         $response->assertStatus(200);
@@ -28,6 +28,8 @@ class ExampleTest extends TestCase
         $response = $this->get('/questions?answer=hoge');
 
         $response->assertViewIs('questions');
+        $response->assertSee('クイズ逆引き事典');
+        $response->assertSee('問題を検索');
         $response->assertSee('hogeが答えになる問題');
         $response->assertStatus(200);
     }
