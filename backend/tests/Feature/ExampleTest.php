@@ -31,6 +31,7 @@ class ExampleTest extends TestCase
         $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
         $response->assertSee('hogeが答えになる問題');
+        //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
         $response->assertStatus(200);
     }
 
@@ -49,5 +50,14 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/questions');
         $response->assertRedirect('/');
+    }
+
+    public function test_問題詳細ページが正しく表示される()
+    {
+        $response = $this->get('/questions/1');
+        $response->assertViewIs('questions.show');
+        $response->assertSee('1');
+        $response->assertSee('コメント一覧');
+        $response->assertStatus(200);
     }
 }

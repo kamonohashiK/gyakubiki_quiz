@@ -17,4 +17,9 @@ class QuestionController extends Controller
 
         return view('questions', compact('answer'));
     }
+
+    public function show($question_id)
+    {
+        return view('questions.show', compact('question_id'));
+    }
 }
