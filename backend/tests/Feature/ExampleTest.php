@@ -12,10 +12,11 @@ class ExampleTest extends TestCase
      *
      * @return void
      */
-    public function test_example()
+    public function test_トップページが正しく表示される()
     {
         $response = $this->get('/');
 
+        $response->assertViewIs('top');
         $response->assertStatus(200);
     }
 }
