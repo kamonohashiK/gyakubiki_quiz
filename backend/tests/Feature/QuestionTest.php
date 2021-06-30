@@ -3,26 +3,11 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class QuestionTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function test_トップページが正しく表示される()
-    {
-        $response = $this->get('/');
-
-        $response->assertViewIs('top');
-        $response->assertSee('クイズ逆引き事典');
-        $response->assertSee('問題を検索');
-        $response->assertSee('最近追加された問題の答え');
-        $response->assertStatus(200);
-    }
-
     public function test_問題一覧ページが正しく表示される()
     {
         $response = $this->get('/questions?answer=hoge');
@@ -52,10 +37,9 @@ class ExampleTest extends TestCase
         $response->assertRedirect('/');
     }
 
+    //TODO: 以下が実際のDBのデータに依存しているのでテストだけで試せるような仕組みにしたい
     public function test_問題詳細ページが正しく表示される()
     {
-        //TODO: テストケースを限定したテストに書き換え
-        //TODO: そろそろテストを分割したい
         $response = $this->get('/questions/1');
         $response->assertViewIs('questions.show');
         $response->assertSee('1');
