@@ -8,6 +8,14 @@ use Tests\TestCase;
 
 class TopTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp() :void
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+    }
+
     public function test_トップページが正しく表示される()
     {
         $response = $this->get('/');

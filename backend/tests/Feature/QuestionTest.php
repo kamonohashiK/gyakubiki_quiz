@@ -5,9 +5,18 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Answer;
 
 class QuestionTest extends TestCase
 {
+    use RefreshDatabase;
+
+    public function setUp() :void
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+    }
+
     public function test_問題一覧ページが正しく表示される()
     {
         $response = $this->get('/questions?answer=hoge');
@@ -40,14 +49,17 @@ class QuestionTest extends TestCase
     //TODO: 以下が実際のDBのデータに依存しているのでテストだけで試せるような仕組みにしたい
     public function test_問題詳細ページが正しく表示される()
     {
-        $response = $this->get('/questions/1');
+        $a = Answer::create(['name' => 'test']);
+        $q = $a->questions()->create(['content' => 'test']);
+
+        $response = $this->get('/questions/' . $q->id);
         $response->assertViewIs('questions.show');
-        $response->assertSee('1');
+        $response->assertSee($q->content);
         $response->assertSee('コメント一覧');
         $response->assertStatus(200);
     }
 
-    public function test_存在しない問題のIDが入力されると404ページに行く()
+    public function test_存在しない問題のidが入力されると404ページに行く()
     {
         $response = $this->get('/questions/2');
         $response->assertStatus(404);
