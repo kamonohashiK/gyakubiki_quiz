@@ -135,4 +135,16 @@ class QuestionTest extends TestCase
         $response->assertViewIs('questions.form');
         $response->assertStatus(200);
     }
+
+    public function test_問題編集ページは作問者以外はリダイレクトする()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id + 1]);
+
+        $response = $this->actingAs($user)
+            ->get('/edit-question/' . $q->id);
+        $response->assertRedirect('/questions/' . $q->id);
+    }
 }

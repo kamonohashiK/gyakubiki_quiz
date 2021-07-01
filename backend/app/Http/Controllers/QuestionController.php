@@ -67,6 +67,12 @@ class QuestionController extends Controller
 
     public function edit(Question $question)
     {
+        $user = Auth::user();
+
+        if ($user->id != $question->user_id) {
+            return redirect(route('questions.show', $question));
+        }
+
         $query = $question->answer->name;
         $edit = true;
         $content = $question->content;
