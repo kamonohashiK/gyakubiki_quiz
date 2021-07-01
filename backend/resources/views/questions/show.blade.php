@@ -13,4 +13,21 @@
 @endif
 
 <h4>コメント一覧</h4>
+<ul>
+@foreach($question->comments as $c)
+<li>{{ $c->content }} {{ $c->created_at}} {{ $c->user->name }}</li>
+@endforeach
+</ul>
+
+@if(Auth::user())
+<b>コメントする</b>
+<form action="{{ route('comments.create', $question) }}" method="POST">
+    @csrf
+    <textarea name="comment" id="" cols="30" rows="10"></textarea>
+    <input type="submit" value="投稿">
+</form>
+@else
+<p>コメントを投稿するにはログインしてください。</p>
+@endif
+
 @endsection
