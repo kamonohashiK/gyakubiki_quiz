@@ -8,4 +8,5 @@ Route::get('/', [TopController::class, 'top'])->name('top');
 
 Route::get('/questions', [QuestionController::class, 'index'])->name('questions.index');
 Route::get('/questions/new', [QuestionController::class, 'new'])->name('questions.new');
+Route::post('/questions/new', [QuestionController::class, 'create'])->name('questions.create');
 Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');

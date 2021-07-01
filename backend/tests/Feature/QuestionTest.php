@@ -78,4 +78,16 @@ class QuestionTest extends TestCase
         $response = $this->get('/questions/new');
         $response->assertRedirect('/');
     }
+
+    public function test_問題作成ページでpostした際、データが正常に保存される()
+    {
+        $response = $this->post('/questions/new', [
+            'answer' => 'hoge',
+            'question' => 'fuga',
+        ]);
+
+        $this->assertDatabaseHas('answers', ['name' => 'hoge']);
+        $this->assertDatabaseHas('questions', ['content' => 'fuga']);
+        $response->assertRedirect('/questions?answer=hoge')->assertSessionHas('success');
+    }
 }

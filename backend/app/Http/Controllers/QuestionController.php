@@ -29,6 +29,7 @@ class QuestionController extends Controller
     public function new(Request $request)
     {
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
+        //TODO: indexとこことで処理を共通化
         if ($request->answer == null) {
             return redirect('/');
         } else {
@@ -36,5 +37,19 @@ class QuestionController extends Controller
         }
 
         return view('questions.new', compact('query'));
+    }
+
+    public function create(Request $request)
+    {
+        //TODO: バリデーション
+        //TODO: 例外処理
+        //TODO: ログ出力
+        $a = Answer::updateOrCreate(['name' => $request->answer]);
+        if ($a) {
+            $q = $a->questions()->create(['content' => $request->question]);
+            if ($q) {
+                return redirect(route('questions.index', ['answer' => $request->answer]))->with('success', '問題を追加しました。');
+            }
+        }
     }
 }

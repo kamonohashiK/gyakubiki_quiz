@@ -17,6 +17,9 @@
             </form>
         </header>
         <div class="main">
+            @if(session('success'))
+            <p> {{ session('success') }}</p>
+            @endif
             @yield('content')
         </div>
     </body>
