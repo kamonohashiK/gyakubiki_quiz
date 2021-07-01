@@ -44,7 +44,7 @@ class QuestionController extends Controller
         //TODO: バリデーション
         //TODO: 例外処理
         //TODO: ログ出力
-        $a = Answer::updateOrCreate(['name' => $request->answer]);
+        $a = Answer::updateOrCreate(['name' => $request->answer]); //TODO: update時はuser_idを書き換えないよう修正
         if ($a) {
             $q = $a->questions()->create(['content' => $request->question]);
             if ($q) {

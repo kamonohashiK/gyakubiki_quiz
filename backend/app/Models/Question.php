@@ -17,7 +17,13 @@ class Question extends Model
         'content'
     ];
 
-    public function answer() {
+    public function answer()
+    {
         return $this->belongsTo('App\Models\Answer');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
     }
 }
