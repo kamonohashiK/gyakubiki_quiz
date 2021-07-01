@@ -25,6 +25,7 @@ class QuestionTest extends TestCase
         $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
         $response->assertSee('hogeが答えになる問題');
+        $response->assertSee('hogeが答えになる問題を作る');
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
         $response->assertStatus(200);
     }
@@ -62,5 +63,19 @@ class QuestionTest extends TestCase
     {
         $response = $this->get('/questions/1');
         $response->assertStatus(404);
+    }
+
+    public function test_問題作成ページが正しく表示される()
+    {
+        $response = $this->get('/questions/new?answer=hoge');
+        $response->assertViewIs('questions.new');
+        $response->assertSee('hoge');
+        $response->assertStatus(200);
+    }
+
+    public function test_問題作成ページでクエリがない場合はトップページにリダイレクト()
+    {
+        $response = $this->get('/questions/new');
+        $response->assertRedirect('/');
     }
 }

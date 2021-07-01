@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>{{ $query }}が答えになる問題</h1>
-
+    <a href="{{route('questions.new', ['answer' => $query])}}">{{ $query }}が答えになる問題を作る</a>
     @if($answer)
         @foreach($answer->questions as $q)
         <div>

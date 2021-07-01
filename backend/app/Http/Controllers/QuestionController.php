@@ -25,4 +25,16 @@ class QuestionController extends Controller
     {
         return view('questions.show', compact('question'));
     }
+
+    public function new(Request $request)
+    {
+        //検索対象となる文字列が存在しない場合はトップにリダイレクト
+        if ($request->answer == null) {
+            return redirect('/');
+        } else {
+            $query = $request->answer;
+        }
+
+        return view('questions.new', compact('query'));
+    }
 }
