@@ -10,3 +10,5 @@ Route::get('/questions', [QuestionController::class, 'index'])->name('questions.
 Route::get('/questions/new', [QuestionController::class, 'new'])->name('questions.new');
 Route::post('/questions/new', [QuestionController::class, 'create'])->name('questions.create');
 Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+
+Auth::routes();
