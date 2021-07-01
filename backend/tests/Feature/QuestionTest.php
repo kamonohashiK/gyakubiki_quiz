@@ -59,13 +59,13 @@ class QuestionTest extends TestCase
         $response->assertDontSee('編集');
         $response->assertSee('コメント一覧');
         $response->assertStatus(200);
+        //TODO: コメント投稿フォームが正しく表示されるかのテストを書きたい
     }
 
     public function test_作問者が問題詳細ページに行くと編集・削除リンクが表示される()
     {
         $user = User::factory()->create();
 
-        
         $a = Answer::create(['name' => 'test', 'user_id' => 1]);
         $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
 

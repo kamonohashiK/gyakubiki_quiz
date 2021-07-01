@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Question extends Model
+class Comment extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -14,21 +14,11 @@ class Question extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'content', 'user_id'
+        'content', 'user_id', 'question_id'
     ];
-
-    public function answer()
-    {
-        return $this->belongsTo('App\Models\Answer');
-    }
 
     public function user()
     {
         return $this->belongsTo('App\Models\User');
-    }
-
-    public function comments()
-    {
-        return $this->hasMany('App\Models\Comment');
     }
 }
