@@ -14,7 +14,7 @@ class AddUserIdToQuestionsTable extends Migration
     public function up()
     {
         Schema::table('questions', function (Blueprint $table) {
-            $table->integer('user_id')->after('answer_id')->default(null);
+            $table->integer('user_id')->after('answer_id')->default(0);
             $table->index('user_id')->change();
         });
     }
