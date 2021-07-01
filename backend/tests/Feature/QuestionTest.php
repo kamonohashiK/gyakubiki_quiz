@@ -56,8 +56,23 @@ class QuestionTest extends TestCase
         $response = $this->get('/questions/' . $q->id);
         $response->assertViewIs('questions.show');
         $response->assertSee($q->content);
+        $response->assertDontSee('編集');
         $response->assertSee('コメント一覧');
         $response->assertStatus(200);
+    }
+
+    public function test_作問者が問題詳細ページに行くと編集リンクが表示される()
+    {
+        $user = User::factory()->create();
+
+        
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
+
+        $response = $response = $this
+            ->actingAs($user)
+            ->get('/questions/' . $q->id);
+        $response->assertSee('編集');
     }
 
     public function test_存在しない問題のidが入力されると404ページに行く()
@@ -78,7 +93,7 @@ class QuestionTest extends TestCase
 
         $response = $this->actingAs($user)
             ->get('/new-question?answer=hoge');
-        $response->assertViewIs('questions.new');
+        $response->assertViewIs('questions.form');
         $response->assertSee('hoge');
         $response->assertStatus(200);
     }
@@ -106,5 +121,18 @@ class QuestionTest extends TestCase
         $this->assertDatabaseHas('answers', ['name' => 'hoge', 'user_id' => $user->id]);
         $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
         $response->assertRedirect('/questions?answer=hoge')->assertSessionHas('success');
+    }
+
+    public function test_問題編集ページを表示する()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id]);
+
+        $response = $this->actingAs($user)
+            ->get('/edit-question/' . $q->id);
+        $response->assertViewIs('questions.form');
+        $response->assertStatus(200);
     }
 }

@@ -38,7 +38,9 @@ class QuestionController extends Controller
             $query = $request->answer;
         }
 
-        return view('questions.new', compact('query'));
+        $edit = false;
+        $content = '';
+        return view('questions.form', compact('query', 'edit', 'content'));
     }
 
     public function create(Request $request)
@@ -61,5 +63,13 @@ class QuestionController extends Controller
                 return redirect(route('questions.index', ['answer' => $request->answer]))->with('success', '問題を追加しました。');
             }
         }
+    }
+
+    public function edit(Question $question)
+    {
+        $query = $question->answer->name;
+        $edit = true;
+        $content = $question->content;
+        return view('questions.form', compact('query', 'edit', 'content'));
     }
 }

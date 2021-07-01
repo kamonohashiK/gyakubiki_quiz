@@ -13,4 +13,5 @@ Route::get('/questions/{question}', [QuestionController::class, 'show'])->name('
 Route::group(['middleware' => 'auth'], function() {
     Route::get('/new-question', [QuestionController::class, 'new'])->name('questions.new');
     Route::post('/new-question', [QuestionController::class, 'create'])->name('questions.create');
+    Route::get('/edit-question/{question}', [QuestionController::class, 'edit'])->name('questions.edit');
 });
