@@ -61,7 +61,7 @@ class QuestionTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_作問者が問題詳細ページに行くと編集リンクが表示される()
+    public function test_作問者が問題詳細ページに行くと編集・削除リンクが表示される()
     {
         $user = User::factory()->create();
 
@@ -73,6 +73,7 @@ class QuestionTest extends TestCase
             ->actingAs($user)
             ->get('/questions/' . $q->id);
         $response->assertSee('編集');
+        $response->assertSee('削除');
     }
 
     public function test_存在しない問題のidが入力されると404ページに行く()
@@ -164,5 +165,29 @@ class QuestionTest extends TestCase
         $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
         $this->assertDatabaseMissing('questions', ['content' => 'test', 'user_id' => $user->id]);
         $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
+    }
+
+    public function test_問題削除が正常に行われる()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id]);
+
+        $response = $this->actingAs($user)
+            ->delete('/delete-question/' . $q->id);
+        $this->assertSoftDeleted('questions', ['content' => 'test', 'user_id' => $user->id]);
+    }
+
+    public function test_作問者以外が問題削除しようとした場合リダイレクト()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id + 1]);
+
+        $response = $this->actingAs($user)
+            ->delete('/delete-question/' . $q->id);
+        $response->assertRedirect('/questions/' . $q->id);
     }
 }

@@ -96,4 +96,19 @@ class QuestionController extends Controller
             return redirect(route('questions.show', $question))->with('success', '問題を編集しました。');
         }
     }
+
+    public function delete(Question $question)
+    {
+        $user = Auth::user();
+
+        if ($user->id != $question->user_id) {
+            return redirect(route('questions.show', $question));
+        }
+
+        //TODO: 例外処理
+        //TODO: ログ出力
+        if ($question->delete()) {
+            return redirect(route('questions.index', ['answer' => $question->answer->name]))->with('success', '問題を削除しました。');
+        }
+    }
 }
