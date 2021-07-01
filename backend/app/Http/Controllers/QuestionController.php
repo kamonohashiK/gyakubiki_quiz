@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use App\Models\Question;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -77,5 +78,22 @@ class QuestionController extends Controller
         $edit = true;
         $content = $question->content;
         return view('questions.form', compact('query', 'edit', 'content'));
+    }
+
+    public function update(Question $question, Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->id != $question->user_id) {
+            return redirect(route('questions.show', $question));
+        }
+
+        //TODO: バリデーション
+        //TODO: 例外処理
+        //TODO: ログ出力
+        $q = $question->update(['content' => $request->question]);
+        if ($q) {
+            return redirect(route('questions.show', $question))->with('success', '問題を編集しました。');
+        }
     }
 }

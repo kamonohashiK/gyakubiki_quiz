@@ -147,4 +147,22 @@ class QuestionTest extends TestCase
             ->get('/edit-question/' . $q->id);
         $response->assertRedirect('/questions/' . $q->id);
     }
+
+    public function test_問題編集ページでpostした際、データが正常に保存される()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id]);
+
+        $response = $this->actingAs($user)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => 'test',
+                'question' => 'fuga',
+            ]);
+        $this->assertDatabaseHas('answers', ['name' => 'test', 'user_id' => 1]);
+        $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
+        $this->assertDatabaseMissing('questions', ['content' => 'test', 'user_id' => $user->id]);
+        $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
+    }
 }
