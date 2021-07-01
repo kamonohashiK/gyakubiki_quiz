@@ -46,7 +46,6 @@ class QuestionTest extends TestCase
         $response->assertRedirect('/');
     }
 
-    //TODO: 以下が実際のDBのデータに依存しているのでテストだけで試せるような仕組みにしたい
     public function test_問題詳細ページが正しく表示される()
     {
         $a = Answer::create(['name' => 'test']);
@@ -61,7 +60,7 @@ class QuestionTest extends TestCase
 
     public function test_存在しない問題のidが入力されると404ページに行く()
     {
-        $response = $this->get('/questions/2');
+        $response = $this->get('/questions/1');
         $response->assertStatus(404);
     }
 }
