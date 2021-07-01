@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Answer;
+use App\Models\User;
 
 class QuestionTest extends TestCase
 {
@@ -65,9 +66,18 @@ class QuestionTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function test_問題作成ページではログインを要求する()
+    {
+        $response = $this->get('/new-question?answer=hoge');
+        $response->assertRedirect('/login');
+    }
+
     public function test_問題作成ページが正しく表示される()
     {
-        $response = $this->get('/questions/new?answer=hoge');
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->get('/new-question?answer=hoge');
         $response->assertViewIs('questions.new');
         $response->assertSee('hoge');
         $response->assertStatus(200);
@@ -75,19 +85,26 @@ class QuestionTest extends TestCase
 
     public function test_問題作成ページでクエリがない場合はトップページにリダイレクト()
     {
-        $response = $this->get('/questions/new');
+        $user = User::factory()->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->get('/new-question');
         $response->assertRedirect('/');
     }
 
     public function test_問題作成ページでpostした際、データが正常に保存される()
     {
-        $response = $this->post('/questions/new', [
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->post('/new-question', [
             'answer' => 'hoge',
             'question' => 'fuga',
         ]);
 
-        $this->assertDatabaseHas('answers', ['name' => 'hoge']);
-        $this->assertDatabaseHas('questions', ['content' => 'fuga']);
+        $this->assertDatabaseHas('answers', ['name' => 'hoge', 'user_id' => $user->id]);
+        $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
         $response->assertRedirect('/questions?answer=hoge')->assertSessionHas('success');
     }
 }

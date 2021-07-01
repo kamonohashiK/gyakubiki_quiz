@@ -14,7 +14,7 @@ class Answer extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'name'
+        'name', 'user_id'
     ];
 
     public function questions() {

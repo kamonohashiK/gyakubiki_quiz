@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
@@ -44,9 +46,17 @@ class QuestionController extends Controller
         //TODO: バリデーション
         //TODO: 例外処理
         //TODO: ログ出力
-        $a = Answer::updateOrCreate(['name' => $request->answer]); //TODO: update時はuser_idを書き換えないよう修正
+        $user = Auth::user();
+
+        $answer = Answer::where('name', $request->answer)->first();
+        if ($answer) {
+            $a = $answer::update();
+        } else {
+            $a = Answer::create(['name' => $request->answer, 'user_id' => $user->id]);
+        }
+
         if ($a) {
-            $q = $a->questions()->create(['content' => $request->question]);
+            $q = $a->questions()->create(['content' => $request->question, 'user_id' => $user->id]);
             if ($q) {
                 return redirect(route('questions.index', ['answer' => $request->answer]))->with('success', '問題を追加しました。');
             }
