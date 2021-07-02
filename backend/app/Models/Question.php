@@ -31,4 +31,9 @@ class Question extends Model
     {
         return $this->hasMany('App\Models\Comment');
     }
+
+    public static function countQuestions()
+    {
+        return Question::count();
+    }
 }
