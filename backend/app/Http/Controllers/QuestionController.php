@@ -52,14 +52,15 @@ class QuestionController extends Controller
         $user = Auth::user();
 
         $answer = Answer::where('name', $request->answer)->first();
-        if ($answer) {
-            $a = $answer::update();
+        if ($answer != null) {
+            $a = $answer->update();
         } else {
             $a = Answer::create(['name' => $request->answer, 'user_id' => $user->id]);
+            $answer = $a;
         }
 
         if ($a) {
-            $q = $a->questions()->create(['content' => $request->question, 'user_id' => $user->id]);
+            $q = $answer->questions()->create(['content' => $request->question, 'user_id' => $user->id]);
             if ($q) {
                 return redirect(route('questions.index', ['answer' => $request->answer]))->with('success', '問題を追加しました。');
             }
