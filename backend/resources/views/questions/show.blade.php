@@ -29,7 +29,7 @@
 
 <ul class="list-group">
     @foreach($question->comments as $c)
-    <li class="list-group-item">{{ $c->content }} {{ $c->created_at}} {{ $c->user->name }}</li>
+    <li class="list-group-item">{{ $c->content }} {{ date('Y年n月j日 H:i:s', strtotime($c->created_at)) }} {{ $c->user->name }}</li>
     @endforeach
 </ul>
 
