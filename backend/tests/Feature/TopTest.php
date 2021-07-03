@@ -32,7 +32,7 @@ class TopTest extends TestCase
         $response->assertSee('登録問題数');
         $response->assertSee('2問');
         $response->assertSee('問題を検索');
-        $response->assertSee('最近追加された問題の答え');
+        $response->assertSee('最近追加された問題');
         $response->assertStatus(200);
     }
 }

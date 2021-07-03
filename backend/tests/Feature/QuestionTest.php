@@ -25,8 +25,8 @@ class QuestionTest extends TestCase
         $response->assertViewIs('questions.index');
         $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
-        $response->assertSee('hogeが答えになる問題');
-        $response->assertSee('hogeが答えになる問題を作る');
+        $response->assertSee('hoge');
+        $response->assertSee('問題を作る');
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
         $response->assertStatus(200);
     }
@@ -35,11 +35,11 @@ class QuestionTest extends TestCase
     {
         $response = $this->get('/questions?answer=fuga');
         $response->assertViewIs('questions.index');
-        $response->assertSee('fugaが答えになる問題');
+        $response->assertSee('fuga');
 
         $response = $this->get('/questions?answer=piyo');
         $response->assertViewIs('questions.index');
-        $response->assertSee('piyoが答えになる問題');
+        $response->assertSee('piyo');
     }
 
     public function test_クエリがない場合はトップページにリダイレクト()
@@ -55,9 +55,11 @@ class QuestionTest extends TestCase
 
         $response = $this->get('/questions/' . $q->id);
         $response->assertViewIs('questions.show');
-        $response->assertSee($q->content);
+        $response->assertSee('test');
+        $response->assertSee('test');
         $response->assertDontSee('編集');
-        $response->assertSee('コメント一覧');
+        $response->assertDontSee('削除');
+        $response->assertSee('コメント');
         $response->assertStatus(200);
         //TODO: コメント投稿フォームが正しく表示されるかのテストを書きたい
     }

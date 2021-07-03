@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 
 @section('content')
-<h1>{{ $edit ? '問題編集' : '問題新規作成' }}</h1>
+<h4>{{ $edit ? '問題編集' : '問題新規作成' }}</h4>
 <p>答え: {{ $query }}</p>
 
 @if($edit)
@@ -11,7 +11,9 @@
 @endif
     @csrf
     <input type="hidden" name="answer" value="{{ $query }}">
-    <textarea name="question" cols="30" rows="10">{{ $content }}</textarea>
-    <input type="submit" value="作成">
+    <div class="mb-3">
+        <textarea name="question" class="form-control" required style="height:80px;">{{ $content }}</textarea>
+    </div>
+    <input type="submit" value="{{ $edit ? '編集' : '作成' }}" class="btn btn-success">
 </form>
 @endsection

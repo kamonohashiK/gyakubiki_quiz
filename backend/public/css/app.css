@@ -1,0 +1,16 @@
+.main {
+    margin: 20px 40px;
+}
+
+.answers {
+    font-size: 18px;
+}
+
+.no-decoration {
+    color: black;
+    text-decoration: none;
+}
+
+.card {
+    margin: 5px;
+}
