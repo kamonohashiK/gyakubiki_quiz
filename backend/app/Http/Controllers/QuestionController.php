@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 
 class QuestionController extends Controller
 {
-    //TODO: 問題を複数表示する場合の表示順をdescにする
     public function index(Request $request)
     {
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
@@ -50,7 +49,6 @@ class QuestionController extends Controller
 
     public function create(QuestionRequest $request)
     {
-        //TODO: 例外処理
         $user = Auth::user();
 
         DB::beginTransaction();
