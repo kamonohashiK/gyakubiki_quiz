@@ -16,6 +16,8 @@ class CommentTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
+
+        $this->VALID_COMMENT = '正常なコメント';
     }
 
     public function test_非ログイン時はコメント投稿フォームを表示しない()
@@ -57,5 +59,49 @@ class CommentTest extends TestCase
             'question_id' => $q->id,
         ]);
         $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
+    }
+
+    public function test_コメントが空文字の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
+
+        $invalid_comment = '';
+
+        $response = $this->actingAs($user)
+            ->from('/questions/' . $q->id)
+            ->post('/new-comment/' . $q->id, [
+                'comment' => $invalid_comment,
+            ]);
+        $this->assertDatabaseMissing('comments', [
+            'content' => $invalid_comment,
+            'user_id' => $user->id,
+            'question_id' => $q->id,
+        ]);
+        $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('errors');
+    }
+
+    public function test_コメントが40文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
+
+        $invalid_comment = str_repeat('あ', 41);
+
+        $response = $this->actingAs($user)
+            ->from('/questions/' . $q->id)
+            ->post('/new-comment/' . $q->id, [
+                'comment' => $invalid_comment,
+            ]);
+        $this->assertDatabaseMissing('comments', [
+            'content' => $invalid_comment,
+            'user_id' => $user->id,
+            'question_id' => $q->id,
+        ]);
+        $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('errors');
     }
 }

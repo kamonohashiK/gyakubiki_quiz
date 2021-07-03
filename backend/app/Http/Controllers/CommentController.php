@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
+use App\Http\Requests\CommentRequest;
 use App\Models\Question;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function create(Question $question, Request $request)
+    public function create(Question $question, CommentRequest $request)
     {
         $user = Auth::user();
         //TODO: バリデーション、例外処理等

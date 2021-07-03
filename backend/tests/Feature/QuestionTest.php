@@ -16,16 +16,19 @@ class QuestionTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
+        
+        $this->VALID_ANSWER = 'かも屋';
+        $this->VALID_QUESTION = 'このアプリの開発者は誰でしょう？';
     }
 
     public function test_問題一覧ページが正しく表示される()
     {
-        $response = $this->get('/questions?answer=hoge');
+        $response = $this->get('/questions?answer=' . $this->VALID_ANSWER);
 
         $response->assertViewIs('questions.index');
         $response->assertSee('クイズ逆引き事典');
         $response->assertSee('問題を検索');
-        $response->assertSee('hoge');
+        $response->assertSee($this->VALID_ANSWER);
         $response->assertSee('問題を作る');
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
         $response->assertStatus(200);
@@ -33,13 +36,16 @@ class QuestionTest extends TestCase
 
     public function test_クエリによってquestionsで表示する文字列が変わる()
     {
-        $response = $this->get('/questions?answer=fuga');
-        $response->assertViewIs('questions.index');
-        $response->assertSee('fuga');
+        $q1 = 'fuga';
+        $q2 = 'piyo';
 
-        $response = $this->get('/questions?answer=piyo');
+        $response = $this->get('/questions?answer=' . $q1);
         $response->assertViewIs('questions.index');
-        $response->assertSee('piyo');
+        $response->assertSee($q1);
+
+        $response = $this->get('/questions?answer=' . $q2);
+        $response->assertViewIs('questions.index');
+        $response->assertSee($q2);
     }
 
     public function test_クエリがない場合はトップページにリダイレクト()
@@ -50,13 +56,13 @@ class QuestionTest extends TestCase
 
     public function test_問題詳細ページが正しく表示される()
     {
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
-        $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => 1]);
 
         $response = $this->get('/questions/' . $q->id);
         $response->assertViewIs('questions.show');
-        $response->assertSee('test');
-        $response->assertSee('test');
+        $response->assertSee($this->VALID_ANSWER);
+        $response->assertSee($this->VALID_QUESTION);
         $response->assertDontSee('編集');
         $response->assertDontSee('削除');
         $response->assertSee('コメント');
@@ -68,8 +74,8 @@ class QuestionTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
-        $q = $a->questions()->create(['content' => 'test', 'user_id' => 1]);
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => 1]);
 
         $response = $response = $this
             ->actingAs($user)
@@ -86,7 +92,7 @@ class QuestionTest extends TestCase
 
     public function test_問題作成ページではログインを要求する()
     {
-        $response = $this->get('/new-question?answer=hoge');
+        $response = $this->get('/new-question?answer=' . $this->VALID_ANSWER);
         $response->assertRedirect('/login');
     }
 
@@ -95,9 +101,9 @@ class QuestionTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->get('/new-question?answer=hoge');
+            ->get('/new-question?answer=' . $this->VALID_ANSWER);
         $response->assertViewIs('questions.form');
-        $response->assertSee('hoge');
+        $response->assertSee($this->VALID_ANSWER);
         $response->assertStatus(200);
     }
 
@@ -117,21 +123,80 @@ class QuestionTest extends TestCase
 
         $response = $this->actingAs($user)
             ->post('/new-question', [
-            'answer' => 'hoge',
-            'question' => 'fuga',
+            'answer' => $this->VALID_ANSWER,
+            'question' => $this->VALID_QUESTION,
         ]);
 
-        $this->assertDatabaseHas('answers', ['name' => 'hoge', 'user_id' => $user->id]);
-        $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
-        $response->assertRedirect('/questions?answer=hoge')->assertSessionHas('success');
+        $this->assertDatabaseHas('answers', ['name' => $this->VALID_ANSWER, 'user_id' => $user->id]);
+        $this->assertDatabaseHas('questions', ['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+        $response->assertRedirect('/questions?answer=' . urlencode($this->VALID_ANSWER))->assertSessionHas('success');
+    }
+
+    public function test_問題作成ページでquestionが空白の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $this->VALID_ANSWER,
+            'question' => '',
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => '', 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、questionが10文字以下の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+        $invalid_question = str_repeat('あ', 9);
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $this->VALID_ANSWER,
+            'question' => $invalid_question,
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => 'あ', 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、questionが100文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+        $invalid_question = str_repeat('あ', 101);
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $this->VALID_ANSWER,
+            'question' => $invalid_question,
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => $invalid_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、answerが20文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+        $invalid_answer = str_repeat('あ', 21);
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $invalid_answer,
+            'question' => $this->VALID_QUESTION,
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
     }
 
     public function test_問題編集ページを表示する()
     {
         $user = User::factory()->create();
 
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
-        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id]);
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
 
         $response = $this->actingAs($user)
             ->get('/edit-question/' . $q->id);
@@ -143,8 +208,8 @@ class QuestionTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
-        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id + 1]);
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id + 1]);
 
         $response = $this->actingAs($user)
             ->get('/edit-question/' . $q->id);
@@ -155,18 +220,77 @@ class QuestionTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
-        $q = $a->questions()->create(['content' => 'test', 'user_id' => $user->id]);
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = 'カモノハシをモチーフにしたTwitterアイコンを使用している、このアプリの作者は誰でしょう？';
 
         $response = $this->actingAs($user)
             ->post('/edit-question/' . $q->id, [
-                'answer' => 'test',
-                'question' => 'fuga',
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
             ]);
-        $this->assertDatabaseHas('answers', ['name' => 'test', 'user_id' => 1]);
-        $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
-        $this->assertDatabaseMissing('questions', ['content' => 'test', 'user_id' => $user->id]);
+        $this->assertDatabaseHas('answers', ['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $this->assertDatabaseHas('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $this->assertDatabaseMissing('questions', ['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
         $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
+    }
+
+    public function test_問題編集時に問題文が空白の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = '';
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
+    }
+
+    public function test_問題編集時に問題文が10文字以下の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = str_repeat('あ', 9);
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
+    }
+
+    public function test_問題編集時に問題文が100文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = str_repeat('あ', 101);
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
     }
 
     public function test_問題削除が正常に行われる()
