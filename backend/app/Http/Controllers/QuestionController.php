@@ -49,7 +49,6 @@ class QuestionController extends Controller
     public function create(QuestionRequest $request)
     {
         //TODO: 例外処理
-        //TODO: ログ出力
         $user = Auth::user();
 
         $answer = Answer::where('name', $request->answer)->first();
@@ -57,12 +56,14 @@ class QuestionController extends Controller
             $a = $answer->update();
         } else {
             $a = Answer::create(['name' => $request->answer, 'user_id' => $user->id]);
+            Log::info("ユーザーID：{$user->id}が解答：{$a->id}を投稿({$request->answer})");
             $answer = $a;
         }
 
         if ($a) {
             $q = $answer->questions()->create(['content' => $request->question, 'user_id' => $user->id]);
             if ($q) {
+                Log::info("ユーザーID：{$user->id}が問題：{$q->id}を投稿({$request->question})");
                 return redirect(route('questions.index', ['answer' => $request->answer]))->with('success', '問題を追加しました。');
             }
         }
@@ -91,9 +92,9 @@ class QuestionController extends Controller
         }
 
         //TODO: 例外処理
-        //TODO: ログ出力
         $q = $question->update(['content' => $request->question]);
         if ($q) {
+            Log::info("ユーザーID：{$user->id}が問題：{$question->id}を編集({$request->question})");
             return redirect(route('questions.show', $question))->with('success', '問題を編集しました。');
         }
     }
@@ -107,8 +108,8 @@ class QuestionController extends Controller
         }
 
         //TODO: 例外処理
-        //TODO: ログ出力
         if ($question->delete()) {
+            Log::info("ユーザーID：{$user->id}が問題：{$question->id}を削除");
             return redirect(route('questions.index', ['answer' => $question->answer->name]))->with('success', '問題を削除しました。');
         }
     }
