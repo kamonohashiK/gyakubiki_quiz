@@ -37,7 +37,7 @@ class CommentTest extends TestCase
         $response = $this->actingAs($user)
             ->get('/questions/' . $q->id);
         $response->assertDontSee('コメントを投稿するにはログインしてください。');
-        $response->assertSee('コメントする');
+        $response->assertSee('コメントを投稿');
     }
 
     public function test_コメントが正しく投稿される()

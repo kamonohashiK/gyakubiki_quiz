@@ -1,33 +1,36 @@
 @extends('layouts.layout')
 
 @section('content')
-<h1>問題詳細</h1>
+<h4>
+    <a href="{{ route('questions.index', ['answer' => $question->answer->name]) }}">{{ $question->answer->name }}</a>が答えになる問題
+</h4>
+
 <p>{{$question->content}}</p>
 @if(Auth::user() && Auth::user()->id == $question->user_id)
-<a href="{{route('questions.edit', $question)}}">編集</a>
 <form id="delete-form" action="{{route('questions.delete', $question)}}" method="post">
     @csrf
     @method('DELETE')
-    <input type="submit" value="削除">
+    <a href="{{route('questions.edit', $question)}}" class="btn btn-primary">編集</a>
+    <input class="btn btn-danger" type="submit" value="削除">
 </form>
 @endif
 
-<h4>コメント一覧</h4>
-<ul>
-@foreach($question->comments as $c)
-<li>{{ $c->content }} {{ $c->created_at}} {{ $c->user->name }}</li>
-@endforeach
-</ul>
-
 @if(Auth::user())
-<b>コメントする</b>
 <form action="{{ route('comments.create', $question) }}" method="POST">
     @csrf
-    <textarea name="comment" id="" cols="30" rows="10"></textarea>
-    <input type="submit" value="投稿">
+    <div class="input-group mb-3">
+        <input name="comment" type="text" class="form-control" placeholder="コメントを投稿" aria-label="Example text with button addon" aria-describedby="button-addon1">
+        <button class="btn btn-success" type="submit" id="button-addon1">投稿</button>
+    </div>
 </form>
 @else
 <p>コメントを投稿するにはログインしてください。</p>
 @endif
+
+<ul class="list-group">
+    @foreach($question->comments as $c)
+    <li class="list-group-item">{{ $c->content }} {{ $c->created_at}} {{ $c->user->name }}</li>
+    @endforeach
+</ul>
 
 @endsection

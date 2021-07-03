@@ -55,9 +55,11 @@ class QuestionTest extends TestCase
 
         $response = $this->get('/questions/' . $q->id);
         $response->assertViewIs('questions.show');
-        $response->assertSee($q->content);
+        $response->assertSee('test');
+        $response->assertSee('test');
         $response->assertDontSee('編集');
-        $response->assertSee('コメント一覧');
+        $response->assertDontSee('削除');
+        $response->assertSee('コメント');
         $response->assertStatus(200);
         //TODO: コメント投稿フォームが正しく表示されるかのテストを書きたい
     }
