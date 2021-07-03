@@ -236,6 +236,63 @@ class QuestionTest extends TestCase
         $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
     }
 
+    public function test_問題編集時に問題文が空白の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = '';
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
+    }
+
+    public function test_問題編集時に問題文が10文字以下の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = str_repeat('あ', 9);
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
+    }
+
+    public function test_問題編集時に問題文が100文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = str_repeat('あ', 101);
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseMissing('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
+    }
+
     public function test_問題削除が正常に行われる()
     {
         $user = User::factory()->create();

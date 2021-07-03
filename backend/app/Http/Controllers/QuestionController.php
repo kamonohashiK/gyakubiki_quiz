@@ -82,7 +82,7 @@ class QuestionController extends Controller
         return view('questions.form', compact('query', 'edit', 'content'));
     }
 
-    public function update(Question $question, Request $request)
+    public function update(Question $question, QuestionRequest $request)
     {
         $user = Auth::user();
 
@@ -90,7 +90,6 @@ class QuestionController extends Controller
             return redirect(route('questions.show', $question));
         }
 
-        //TODO: バリデーション
         //TODO: 例外処理
         //TODO: ログ出力
         $q = $question->update(['content' => $request->question]);
