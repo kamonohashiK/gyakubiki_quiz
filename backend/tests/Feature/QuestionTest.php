@@ -118,12 +118,40 @@ class QuestionTest extends TestCase
         $response = $this->actingAs($user)
             ->post('/new-question', [
             'answer' => 'hoge',
-            'question' => 'fuga',
+            'question' => '漫画「ドラえもん」の作者は誰でしょう？',
         ]);
 
         $this->assertDatabaseHas('answers', ['name' => 'hoge', 'user_id' => $user->id]);
-        $this->assertDatabaseHas('questions', ['content' => 'fuga', 'user_id' => $user->id]);
+        $this->assertDatabaseHas('questions', ['content' => '漫画「ドラえもん」の作者は誰でしょう？', 'user_id' => $user->id]);
         $response->assertRedirect('/questions?answer=hoge')->assertSessionHas('success');
+    }
+
+    public function test_問題作成ページでquestionが空白の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => 'hoge',
+            'question' => '',
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => '', 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、questionが10文字以下の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => 'hoge',
+            'question' => 'あ',
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => 'あ', 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
     }
 
     public function test_問題編集ページを表示する()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QuestionRequest;
 use App\Models\Answer;
 use App\Models\Question;
 use Carbon\Carbon;
@@ -45,9 +46,8 @@ class QuestionController extends Controller
         return view('questions.form', compact('query', 'edit', 'content'));
     }
 
-    public function create(Request $request)
+    public function create(QuestionRequest $request)
     {
-        //TODO: バリデーション
         //TODO: 例外処理
         //TODO: ログ出力
         $user = Auth::user();
