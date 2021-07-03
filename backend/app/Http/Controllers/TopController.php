@@ -10,8 +10,10 @@ class TopController extends Controller
 {
     public function top()
     {
-        $answers = Answer::orderBy('updated_at')->get();
+        $questions = Question::orderByDesc('updated_at')
+            ->limit(10)
+            ->get();
         $count = Question::countQuestions();
-        return view('top', compact('answers', 'count'));
+        return view('top', compact('questions', 'count'));
     }
 }
