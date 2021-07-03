@@ -149,14 +149,45 @@ class QuestionTest extends TestCase
     public function test_問題投稿時、questionが10文字以下の場合、データは保存されない()
     {
         $user = User::factory()->create();
+        $invalid_question = str_repeat('あ', 9);
 
         $response = $this->actingAs($user)
             ->from('/new-question')
             ->post('/new-question', [
-            'answer' => $this->VALID_QUESTION,
-            'question' => 'あ',
+            'answer' => $this->VALID_ANSWER,
+            'question' => $invalid_question,
         ]);
         $this->assertDatabaseMissing('questions', ['content' => 'あ', 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、questionが100文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+        $invalid_question = str_repeat('あ', 101);
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $this->VALID_ANSWER,
+            'question' => $invalid_question,
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => $invalid_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/new-question')->assertSessionHas('errors');
+    }
+
+    public function test_問題投稿時、answerが20文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+        $invalid_answer = str_repeat('あ', 21);
+
+        $response = $this->actingAs($user)
+            ->from('/new-question')
+            ->post('/new-question', [
+            'answer' => $invalid_answer,
+            'question' => $this->VALID_QUESTION,
+        ]);
+        $this->assertDatabaseMissing('questions', ['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
         $response->assertRedirect('/new-question')->assertSessionHas('errors');
     }
 
