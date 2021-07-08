@@ -23,13 +23,25 @@ class QuestionController extends Controller
             $query = $request->answer;
             $like = true;
             $answer = Answer::likeSearch($query)->get();
+            $questions = [];
+            foreach ($answer as $a) {
+                foreach ($a->questions as $q) {
+                    array_push($questions, $q);
+                }
+            }
         } else {
             $query = $request->answer;
             $like = false;
             $answer = Answer::where('name', $query)->first();
+            if ($answer) {
+                $questions = $answer->questions;
+            } else {
+                $questions = [];
+            }
         }
+        $suffix = $like ? 'が答えに含まれる問題' : 'が答えになる問題';
 
-        return view('questions.index', compact('query', 'answer', 'like'));
+        return view('questions.index', compact('query', 'answer', 'like', 'questions', 'suffix'));
     }
 
     public function show(Question $question)
@@ -40,7 +52,6 @@ class QuestionController extends Controller
     public function new(Request $request)
     {
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
-        //TODO: indexとこことで処理を共通化
         if ($request->answer == null) {
             return redirect('/');
         } else {
