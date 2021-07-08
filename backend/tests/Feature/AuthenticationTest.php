@@ -40,4 +40,14 @@ class AuthenticationTest extends TestCase
         $response->assertSee('新規登録');
         $response->assertStatus(200);
     }
+
+    public function test_パスワードリセットページが正しく表示される()
+    {
+        $response = $this->get('/password/reset');
+        $response->assertViewIs('auth.passwords.email');
+        $response->assertSee('パスワードリセット');
+        $response->assertSee('メールアドレス');
+        $response->assertSee('パスワードリセットリンクを送信');
+        $response->assertStatus(200);
+    }
 }
