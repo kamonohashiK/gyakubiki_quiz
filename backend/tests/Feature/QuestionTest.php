@@ -27,10 +27,18 @@ class QuestionTest extends TestCase
 
         $response->assertViewIs('questions.index');
         $response->assertSee('クイズ逆引き事典');
-        $response->assertSee('問題を検索');
-        $response->assertSee($this->VALID_ANSWER);
+        $response->assertSee('検索ワード');
+        $response->assertSeeText($this->VALID_ANSWER . 'が答えになる問題');
         $response->assertSee('問題を作る');
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
+        $response->assertStatus(200);
+    }
+
+    public function test_likeクエリがある場合、問題一覧ページが正しく表示される()
+    {
+        $response = $this->get('/questions?answer=' . $this->VALID_ANSWER . '&like=1');
+        $response->assertSeeText($this->VALID_ANSWER . 'が答えに含まれる問題');
+        $response->assertDontSee('問題を作る');
         $response->assertStatus(200);
     }
 

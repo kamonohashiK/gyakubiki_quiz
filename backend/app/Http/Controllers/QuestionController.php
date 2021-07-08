@@ -19,12 +19,17 @@ class QuestionController extends Controller
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
         if ($request->answer == null) {
             return redirect('/');
+        } else if ($request->like) {
+            $query = $request->answer;
+            $like = true;
+            $answer = Answer::likeSearch($query)->get();
         } else {
             $query = $request->answer;
+            $like = false;
             $answer = Answer::where('name', $query)->first();
         }
 
-        return view('questions.index', compact('query', 'answer'));
+        return view('questions.index', compact('query', 'answer', 'like'));
     }
 
     public function show(Question $question)
