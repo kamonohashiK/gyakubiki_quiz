@@ -68,7 +68,7 @@
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <p>ユーザー登録がお済みでない場合
-                                    <a type="submit" class="btn btn-primary" href="{{route('register')}}">
+                                    <a type="submit" href="{{route('register')}}">
                                         {{ __('新規登録') }}
                                     </a>
                                 </p>

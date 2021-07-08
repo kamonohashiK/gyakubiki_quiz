@@ -26,4 +26,18 @@ class AuthenticationTest extends TestCase
         $response->assertSee('新規登録');
         $response->assertStatus(200);
     }
+
+    public function test_サインアップページが正しく表示される()
+    {
+        $response = $this->get('/register');
+
+        $response->assertViewIs('auth.register');
+        $response->assertSee('ユーザー登録');
+        $response->assertSee('ユーザー名');
+        $response->assertSee('メールアドレス');
+        $response->assertSee('パスワード');
+        $response->assertSee('パスワード(確認)');
+        $response->assertSee('新規登録');
+        $response->assertStatus(200);
+    }
 }
