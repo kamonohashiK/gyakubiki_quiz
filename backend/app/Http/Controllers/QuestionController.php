@@ -39,6 +39,8 @@ class QuestionController extends Controller
                 $questions = [];
             }
         }
+        $request->session()->put('query', $query);
+        $request->session()->put('like', $like);
         $suffix = $like ? 'が答えに含まれる問題' : 'が答えになる問題';
 
         return view('questions.index', compact('query', 'answer', 'like', 'questions', 'suffix'));

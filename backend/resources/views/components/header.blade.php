@@ -4,11 +4,11 @@
 
         <form class="row" action="{{route('questions.index')}}" method="GET">
             <div class="col-auto">
-                <input class="form-control me-2" type="text" name="answer" placeholder="検索ワード" aria-label="Search" />
+                <input class="form-control me-2" type="text" name="answer" placeholder="検索ワード" aria-label="Search" value="{{ session()->get('query') }}"/>
             </div>
             <div class="col-auto">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" name="like" type="checkbox" id="flexSwitchCheckChecked" value="1">
+                    <input class="form-check-input" name="like" type="checkbox" id="flexSwitchCheckChecked" value="1" @if(session()->get('like')) checked @endif>
                     <label class="form-check-label" for="flexSwitchCheckChecked">を含む</label>
                 </div>
             </div>

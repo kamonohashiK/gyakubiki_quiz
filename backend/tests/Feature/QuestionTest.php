@@ -30,6 +30,7 @@ class QuestionTest extends TestCase
         $response->assertSee('検索ワード');
         $response->assertSeeText($this->VALID_ANSWER . 'が答えになる問題');
         $response->assertSee('問題を作る');
+        $response->assertSessionHas('query', $this->VALID_ANSWER);
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
         $response->assertStatus(200);
     }
@@ -39,6 +40,8 @@ class QuestionTest extends TestCase
         $response = $this->get('/questions?answer=' . $this->VALID_ANSWER . '&like=1');
         $response->assertSeeText($this->VALID_ANSWER . 'が答えに含まれる問題');
         $response->assertDontSee('問題を作る');
+        $response->assertSessionHas('query', $this->VALID_ANSWER);
+        $response->assertSessionHas('like', 1);
         $response->assertStatus(200);
     }
 
