@@ -17,7 +17,13 @@ class Answer extends Model
         'name', 'user_id'
     ];
 
-    public function questions() {
+    public function questions() 
+    {
         return $this->hasMany('App\Models\Question')->latest();
+    }
+
+    public static function likeSearch($query)
+    {
+        return self::where('name','like','%'.$query.'%');
     }
 }

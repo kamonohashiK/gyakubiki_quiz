@@ -32,6 +32,7 @@ class Question extends Model
         return $this->hasMany('App\Models\Comment');
     }
 
+    //現在登録されている全ての問題数を返す
     public static function countQuestions()
     {
         return Question::count();
