@@ -74,6 +74,7 @@ class QuestionTest extends TestCase
         $response->assertViewIs('questions.show');
         $response->assertSee($this->VALID_ANSWER);
         $response->assertSee($this->VALID_QUESTION);
+        $response->assertSee('問題を作る');
         $response->assertDontSee('編集');
         $response->assertDontSee('削除');
         $response->assertSee('コメント');

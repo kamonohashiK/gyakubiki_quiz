@@ -3,6 +3,7 @@
 @section('content')
 <h4>
     <a href="{{ route('questions.index', ['answer' => $question->answer->name]) }}">{{ $question->answer->name }}</a>が答えになる問題
+    <a href="{{ route('questions.new', ['answer' => $question->answer->name]) }}" class="btn btn-primary">問題を作る</a>
 </h4>
 
 <p>{{$question->content}}</p>
