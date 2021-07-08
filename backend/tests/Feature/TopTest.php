@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Answer;
+use App\Models\User;
 
 class TopTest extends TestCase
 {
@@ -19,10 +20,12 @@ class TopTest extends TestCase
 
     public function test_トップページが正しく表示される()
     {
-        $a = Answer::create(['name' => 'test', 'user_id' => 1]);
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $a = Answer::create(['name' => 'test', 'user_id' => $user1->id]);
         $a->questions()->createMany([
-            ['content' => 'test', 'user_id' => 1],
-            ['content' => 'test', 'user_id' => 2],
+            ['content' => 'test', 'user_id' => $user1->id],
+            ['content' => 'test', 'user_id' => $user2->id],
         ]);
 
         $response = $this->get('/');
