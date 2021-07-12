@@ -22,13 +22,14 @@ class QuestionController extends Controller
         } else if ($request->question) {
             //この辺リファクタリングできそう
             $query = $request->answer;
+            $q = true;
             $like = true;
             $suffix = 'が問題文に含まれる問題';
             $answer = $query;
-            $request->session()->put('question', true);
-            $questions = Question::likeSearch($query)->get();
+            $questions = Question::likeSearch($query)->count() > 0 ? Question::likeSearch($query)->get() : [];
         } else if ($request->like) {
             $query = $request->answer;
+            $q = false;
             $like = true;
             $suffix = 'が答えに含まれる問題';
             $answer = Answer::likeSearch($query)->get();
@@ -40,6 +41,7 @@ class QuestionController extends Controller
             }
         } else {
             $query = $request->answer;
+            $q = false;
             $like = false;
             $suffix = 'が答えになる問題';
             $answer = Answer::where('name', $query)->first();
@@ -51,6 +53,7 @@ class QuestionController extends Controller
         }
         $request->session()->put('query', $query);
         $request->session()->put('like', $like);
+        $request->session()->put('question', $q);
 
         return view('questions.index', compact('query', 'answer', 'like', 'questions', 'suffix'));
     }
