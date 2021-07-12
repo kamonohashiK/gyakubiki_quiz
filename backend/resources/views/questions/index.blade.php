@@ -1,12 +1,14 @@
 @extends('layouts.layout')
-
 @section('content')
 <h4>
-    <b>{{ $query }}</b>が答えになる問題
-    <a href="{{route('questions.new', ['answer' => $query])}}" class="btn btn-primary" style="margin:5px;">問題を作る</a>
+    <b>{{ $query }}</b>{{ $suffix }}
+    @if(!$like)
+        <a href="{{route('questions.new', ['answer' => $query])}}" class="btn btn-primary" style="margin:5px;">問題を作る</a>
+    @endif
 </h4>
-@if($answer)
-    @foreach($answer->questions as $q)
+
+@if($questions)
+    @foreach($questions as $q)
         <x-card :q="$q" />
     @endforeach
 @else

@@ -32,8 +32,15 @@ class Question extends Model
         return $this->hasMany('App\Models\Comment');
     }
 
+    //現在登録されている全ての問題数を返す
     public static function countQuestions()
     {
         return Question::count();
+    }
+
+    //問題文をLIKE検索した結果を返す
+    public static function likeSearch($query)
+    {
+        return self::where('content', 'like', '%' . $query . '%');
     }
 }

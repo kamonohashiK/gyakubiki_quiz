@@ -19,12 +19,43 @@ class QuestionController extends Controller
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
         if ($request->answer == null) {
             return redirect('/');
+        } else if ($request->question) {
+            //この辺リファクタリングできそう
+            $query = $request->answer;
+            $q = true;
+            $like = true;
+            $suffix = 'が問題文に含まれる問題';
+            $answer = $query;
+            $questions = Question::likeSearch($query)->count() > 0 ? Question::likeSearch($query)->get() : [];
+        } else if ($request->like) {
+            $query = $request->answer;
+            $q = false;
+            $like = true;
+            $suffix = 'が答えに含まれる問題';
+            $answer = Answer::likeSearch($query)->get();
+            $questions = [];
+            foreach ($answer as $a) {
+                foreach ($a->questions as $q) {
+                    array_push($questions, $q);
+                }
+            }
         } else {
             $query = $request->answer;
+            $q = false;
+            $like = false;
+            $suffix = 'が答えになる問題';
             $answer = Answer::where('name', $query)->first();
+            if ($answer) {
+                $questions = $answer->questions;
+            } else {
+                $questions = [];
+            }
         }
+        $request->session()->put('query', $query);
+        $request->session()->put('like', $like);
+        $request->session()->put('question', $q);
 
-        return view('questions.index', compact('query', 'answer'));
+        return view('questions.index', compact('query', 'answer', 'like', 'questions', 'suffix'));
     }
 
     public function show(Question $question)
@@ -35,7 +66,6 @@ class QuestionController extends Controller
     public function new(Request $request)
     {
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
-        //TODO: indexとこことで処理を共通化
         if ($request->answer == null) {
             return redirect('/');
         } else {

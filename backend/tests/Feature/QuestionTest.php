@@ -27,10 +27,41 @@ class QuestionTest extends TestCase
 
         $response->assertViewIs('questions.index');
         $response->assertSee('クイズ逆引き事典');
-        $response->assertSee('問題を検索');
-        $response->assertSee($this->VALID_ANSWER);
+        $response->assertSee('検索ワード');
+        $response->assertSeeText($this->VALID_ANSWER . 'が答えになる問題');
         $response->assertSee('問題を作る');
+        $response->assertSessionHas('query', $this->VALID_ANSWER);
         //TODO: 問題のリストが正しく表示されるかを試すテストを書きたい
+        $response->assertStatus(200);
+    }
+
+    public function test_likeクエリがある場合、問題一覧ページが正しく表示される()
+    {
+        $response = $this->get('/questions?answer=' . $this->VALID_ANSWER . '&like=1');
+        $response->assertSeeText($this->VALID_ANSWER . 'が答えに含まれる問題');
+        $response->assertDontSee('問題を作る');
+        $response->assertSessionHas('query', $this->VALID_ANSWER);
+        $response->assertSessionHas('like', 1);
+        $response->assertStatus(200);
+    }
+
+    public function test_questionクエリがある場合、問題文に特定のワードが含まれる問題が表示される()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q1 = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+        $q2 = $a->questions()->create(['content' => 'かも屋の出身地はどこでしょう？', 'user_id' => $user->id]);
+
+        $response = $this->get('/questions?answer=' . $this->VALID_ANSWER . '&question=1');
+        $response->assertSeeText($this->VALID_ANSWER . 'が問題文に含まれる問題');
+
+        $response->assertDontSee($this->VALID_QUESTION);
+        $response->assertSee('かも屋の出身地はどこでしょう？');
+
+        $response->assertSessionHas('query', $this->VALID_ANSWER);
+        $response->assertSessionHas('like', 1);
+        $response->assertSessionHas('question', 1);
         $response->assertStatus(200);
     }
 
@@ -63,6 +94,7 @@ class QuestionTest extends TestCase
         $response->assertViewIs('questions.show');
         $response->assertSee($this->VALID_ANSWER);
         $response->assertSee($this->VALID_QUESTION);
+        $response->assertSee('問題を作る');
         $response->assertDontSee('編集');
         $response->assertDontSee('削除');
         $response->assertSee('コメント');
