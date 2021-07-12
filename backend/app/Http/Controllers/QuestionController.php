@@ -19,9 +19,18 @@ class QuestionController extends Controller
         //検索対象となる文字列が存在しない場合はトップにリダイレクト
         if ($request->answer == null) {
             return redirect('/');
+        } else if ($request->question) {
+            //この辺リファクタリングできそう
+            $query = $request->answer;
+            $like = true;
+            $suffix = 'が問題文に含まれる問題';
+            $answer = $query;
+            $request->session()->put('question', true);
+            $questions = Question::likeSearch($query)->get();
         } else if ($request->like) {
             $query = $request->answer;
             $like = true;
+            $suffix = 'が答えに含まれる問題';
             $answer = Answer::likeSearch($query)->get();
             $questions = [];
             foreach ($answer as $a) {
@@ -32,6 +41,7 @@ class QuestionController extends Controller
         } else {
             $query = $request->answer;
             $like = false;
+            $suffix = 'が答えになる問題';
             $answer = Answer::where('name', $query)->first();
             if ($answer) {
                 $questions = $answer->questions;
@@ -41,7 +51,6 @@ class QuestionController extends Controller
         }
         $request->session()->put('query', $query);
         $request->session()->put('like', $like);
-        $suffix = $like ? 'が答えに含まれる問題' : 'が答えになる問題';
 
         return view('questions.index', compact('query', 'answer', 'like', 'questions', 'suffix'));
     }

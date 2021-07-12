@@ -37,4 +37,10 @@ class Question extends Model
     {
         return Question::count();
     }
+
+    //問題文をLIKE検索した結果を返す
+    public static function likeSearch($query)
+    {
+        return self::where('content', 'like', '%' . $query . '%');
+    }
 }
