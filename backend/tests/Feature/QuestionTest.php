@@ -136,6 +136,7 @@ class QuestionTest extends TestCase
             ->get('/new-question?answer=' . $this->VALID_ANSWER);
         $response->assertViewIs('questions.form');
         $response->assertSee($this->VALID_ANSWER);
+        $response->assertSee('/100');
         $response->assertStatus(200);
     }
 
@@ -233,6 +234,7 @@ class QuestionTest extends TestCase
         $response = $this->actingAs($user)
             ->get('/edit-question/' . $q->id);
         $response->assertViewIs('questions.form');
+        $response->assertSee('/100');
         $response->assertStatus(200);
     }
 
