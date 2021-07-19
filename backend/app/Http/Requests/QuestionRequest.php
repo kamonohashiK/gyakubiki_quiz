@@ -25,7 +25,7 @@ class QuestionRequest extends FormRequest
     {
         return [
             'answer' => ['required', 'max:20'],
-            'question' => ['required', 'min:10', 'max:100'],
+            'question' => ['required', 'min:10', 'max:120'],
         ];
     }
 
@@ -34,8 +34,8 @@ class QuestionRequest extends FormRequest
             'answer.required'  => '答えが設定されていません。',
             'answer.max'  => '20文字以上の答えは登録できません。',
             'question.required'  => '問題を入力してください。',
-            'question.min'  => '問題文は10文字以上100文字以内で入力してください。',
-            'question.max'  => '問題文は10文字以上100文字以内で入力してください。',
+            'question.min'  => '問題文は10文字以上120文字以内で入力してください。',
+            'question.max'  => '問題文は10文字以上120文字以内で入力してください。',
         ];
     }
 }

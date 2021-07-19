@@ -12,9 +12,9 @@
         @csrf
         <input type="hidden" name="answer" value="{{ $query }}">
         <div class="mb-3">
-            <textarea name="question" class="form-control" required style="height:80px;" placeholder="10字以上100字以内" v-model="question"></textarea>
+            <textarea name="question" class="form-control" required style="height:80px;" placeholder="10字以上120字以内" v-model="question"></textarea>
         </div>
-        <p><span v-bind:class="{ invalid: !valid }">@{{question.length}}</span>/100</p>
+        <p><span v-bind:class="{ invalid: !valid }">@{{question.length}}</span>/120</p>
         <input type="submit" value="{{ $edit ? '編集' : '作成' }}" class="btn btn-success" :disabled="!valid">
     </form>
 
@@ -26,7 +26,7 @@
             },
             computed: {
                 valid() {
-                    return this.question.length >= 10 && this.question.length <= 100;
+                    return this.question.length >= 10 && this.question.length <= 120;
                 }
             }
         });
