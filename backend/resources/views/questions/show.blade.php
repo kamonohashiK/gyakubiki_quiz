@@ -6,7 +6,7 @@
     <a href="{{ route('questions.new', ['answer' => $question->answer->name]) }}" class="btn btn-primary">問題を作る</a>
 </h4>
 
-<p>{{$question->content}}</p>
+<p>{!! convertLink(htmlentities($question->content)) !!}</p>
 @if(Auth::user() && Auth::user()->id == $question->user_id)
 <form id="delete-form" action="{{route('questions.delete', $question)}}" method="post">
     @csrf
