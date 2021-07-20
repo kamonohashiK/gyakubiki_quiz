@@ -136,7 +136,7 @@ class QuestionTest extends TestCase
             ->get('/new-question?answer=' . $this->VALID_ANSWER);
         $response->assertViewIs('questions.form');
         $response->assertSee($this->VALID_ANSWER);
-        $response->assertSee('/100');
+        $response->assertSee('/120');
         $response->assertStatus(200);
     }
 
@@ -194,10 +194,10 @@ class QuestionTest extends TestCase
         $response->assertRedirect('/new-question')->assertSessionHas('errors');
     }
 
-    public function test_問題投稿時、questionが100文字以上の場合、データは保存されない()
+    public function test_問題投稿時、questionが120文字以上の場合、データは保存されない()
     {
         $user = User::factory()->create();
-        $invalid_question = str_repeat('あ', 101);
+        $invalid_question = str_repeat('あ', 121);
 
         $response = $this->actingAs($user)
             ->from('/new-question')
@@ -234,7 +234,7 @@ class QuestionTest extends TestCase
         $response = $this->actingAs($user)
             ->get('/edit-question/' . $q->id);
         $response->assertViewIs('questions.form');
-        $response->assertSee('/100');
+        $response->assertSee('/120');
         $response->assertStatus(200);
     }
 
@@ -308,14 +308,34 @@ class QuestionTest extends TestCase
         $response->assertRedirect('/edit-question/' . $q->id)->assertSessionHas('errors');
     }
 
-    public function test_問題編集時に問題文が100文字以上の場合、データは保存されない()
+    public function test_問題編集時に問題文が120文字以内の場合、データが正常に保存される()
     {
         $user = User::factory()->create();
 
         $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
         $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
 
-        $new_question = str_repeat('あ', 101);
+        $new_question = str_repeat('あ', 120);
+
+        $response = $this->actingAs($user)
+            ->from('/edit-question/' . $q->id)
+            ->post('/edit-question/' . $q->id, [
+                'answer' => $this->VALID_ANSWER,
+                'question' => $new_question,
+            ]);
+        $this->assertDatabaseHas('answers', ['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $this->assertDatabaseHas('questions', ['content' => $new_question, 'user_id' => $user->id]);
+        $response->assertRedirect('/questions/' . $q->id)->assertSessionHas('success');
+    }
+
+    public function test_問題編集時に問題文が120文字以上の場合、データは保存されない()
+    {
+        $user = User::factory()->create();
+
+        $a = Answer::create(['name' => $this->VALID_ANSWER, 'user_id' => 1]);
+        $q = $a->questions()->create(['content' => $this->VALID_QUESTION, 'user_id' => $user->id]);
+
+        $new_question = str_repeat('あ', 121);
 
         $response = $this->actingAs($user)
             ->from('/edit-question/' . $q->id)
