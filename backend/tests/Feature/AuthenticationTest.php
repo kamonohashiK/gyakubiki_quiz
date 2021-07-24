@@ -14,6 +14,8 @@ class AuthenticationTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
+
+        $this->VALID_TITLE = 'クイズ逆引き事典';
     }
 
     public function test_ログインページが正しく表示される()
@@ -21,6 +23,7 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/login');
 
         $response->assertViewIs('auth.login');
+        $response->assertSee("ログイン | {$this->VALID_TITLE}");
         $response->assertSee('メールアドレス');
         $response->assertSee('パスワード');
         $response->assertSee('新規登録');
@@ -32,6 +35,7 @@ class AuthenticationTest extends TestCase
         $response = $this->get('/register');
 
         $response->assertViewIs('auth.register');
+        $response->assertSee("ユーザー登録 | {$this->VALID_TITLE}");
         $response->assertSee('ユーザー登録');
         $response->assertSee('ユーザー名');
         $response->assertSee('メールアドレス');
@@ -45,6 +49,7 @@ class AuthenticationTest extends TestCase
     {
         $response = $this->get('/password/reset');
         $response->assertViewIs('auth.passwords.email');
+        $response->assertSee("パスワードリセット | {$this->VALID_TITLE}");
         $response->assertSee('パスワードリセット');
         $response->assertSee('メールアドレス');
         $response->assertSee('パスワードリセットリンクを送信');
