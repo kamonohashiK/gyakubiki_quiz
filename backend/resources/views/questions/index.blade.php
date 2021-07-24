@@ -1,4 +1,5 @@
 @extends('layouts.layout')
+@section('title', $query . $suffix)
 @section('content')
 <h4>
     <b>{{ $query }}</b>{{ $suffix }}

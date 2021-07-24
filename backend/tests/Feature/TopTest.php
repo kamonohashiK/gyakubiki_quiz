@@ -31,7 +31,7 @@ class TopTest extends TestCase
         $response = $this->get('/');
 
         $response->assertViewIs('top');
-        $response->assertSee('クイズ逆引き事典');
+        $response->assertSeeText('クイズ逆引き事典');
         $response->assertSee('登録問題数');
         $response->assertSee('2問');
         $response->assertSee('検索ワード');

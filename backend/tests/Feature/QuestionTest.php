@@ -16,7 +16,8 @@ class QuestionTest extends TestCase
     {
         parent::setUp();
         $this->artisan('migrate');
-        
+
+        $this->VALID_TITLE = 'クイズ逆引き事典';
         $this->VALID_ANSWER = 'かも屋';
         $this->VALID_QUESTION = 'このアプリの開発者は誰でしょう？';
     }
@@ -26,7 +27,7 @@ class QuestionTest extends TestCase
         $response = $this->get('/questions?answer=' . $this->VALID_ANSWER);
 
         $response->assertViewIs('questions.index');
-        $response->assertSee('クイズ逆引き事典');
+        $response->assertSee($this->VALID_TITLE);
         $response->assertSee('検索ワード');
         $response->assertSeeText($this->VALID_ANSWER . 'が答えになる問題');
         $response->assertSee('問題を作る');
@@ -37,8 +38,11 @@ class QuestionTest extends TestCase
 
     public function test_likeクエリがある場合、問題一覧ページが正しく表示される()
     {
+        $title = $this->VALID_ANSWER . 'が答えに含まれる問題';
+
         $response = $this->get('/questions?answer=' . $this->VALID_ANSWER . '&like=1');
-        $response->assertSeeText($this->VALID_ANSWER . 'が答えに含まれる問題');
+        $response->assertSeeText($title . " | " . $this->VALID_TITLE);
+        $response->assertSeeText($title);
         $response->assertDontSee('問題を作る');
         $response->assertSessionHas('query', $this->VALID_ANSWER);
         $response->assertSessionHas('like', 1);
@@ -73,10 +77,12 @@ class QuestionTest extends TestCase
         $response = $this->get('/questions?answer=' . $q1);
         $response->assertViewIs('questions.index');
         $response->assertSee($q1);
+        $response->assertSee("{$q1}が答えになる問題 | {$this->VALID_TITLE}");
 
         $response = $this->get('/questions?answer=' . $q2);
         $response->assertViewIs('questions.index');
         $response->assertSee($q2);
+        $response->assertSee("{$q2}が答えになる問題 | {$this->VALID_TITLE}");
     }
 
     public function test_クエリがない場合はトップページにリダイレクト()
@@ -94,6 +100,7 @@ class QuestionTest extends TestCase
         $response->assertViewIs('questions.show');
         $response->assertSee($this->VALID_ANSWER);
         $response->assertSee($this->VALID_QUESTION);
+        $response->assertSee("{$this->VALID_ANSWER}が答えになる問題 | {$this->VALID_TITLE}");
         $response->assertSee('問題を作る');
         $response->assertDontSee('編集');
         $response->assertDontSee('削除');
@@ -135,6 +142,7 @@ class QuestionTest extends TestCase
         $response = $this->actingAs($user)
             ->get('/new-question?answer=' . $this->VALID_ANSWER);
         $response->assertViewIs('questions.form');
+        $response->assertSee("問題新規作成 | {$this->VALID_TITLE}");
         $response->assertSee($this->VALID_ANSWER);
         $response->assertSee('/120');
         $response->assertStatus(200);
@@ -234,6 +242,7 @@ class QuestionTest extends TestCase
         $response = $this->actingAs($user)
             ->get('/edit-question/' . $q->id);
         $response->assertViewIs('questions.form');
+        $response->assertSee("問題編集 | {$this->VALID_TITLE}");
         $response->assertSee('/120');
         $response->assertStatus(200);
     }

@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-
+@section('title', $edit ? '問題編集' : '問題新規作成')
 @section('content')
 <h4>{{ $edit ? '問題編集' : '問題新規作成' }}</h4>
 <p>答え: {{ $query }}</p>
